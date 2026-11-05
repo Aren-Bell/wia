@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { db, comments, posts, users, votes, notifications } from "@/db";
 import { eq, and, asc, sql, inArray } from "drizzle-orm";
 import { getSessionUser } from "@/lib/auth-helper";
+import { enforceRateLimit } from "@/lib/rate-limit";
+import { isDuplicateRequest } from "@/lib/debounce";
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -98,9 +100,22 @@ export async function POST(req: NextRequest, { params }: Params) {
   try {
     const { id: postId } = await params;
     const currentUser = await getSessionUser(req);
+
+    // Rate Limit: Max 15 comments per minute
+    const rateLimitError = enforceRateLimit(req, currentUser.id, { limit: 15, windowMs: 60000 }, "comment");
+    if (rateLimitError) return rateLimitError;
+
     const body = await req.json();
 
     const { content, parentId = null, images = [] } = body;
+
+    // Prevent double-click duplicate comment
+    if (isDuplicateRequest(`comment:${currentUser.id}:${postId}:${content?.trim()}`, 1500)) {
+      return NextResponse.json(
+        { success: false, error: "Duplicate comment detected. Please wait a moment." },
+        { status: 429 }
+      );
+    }
 
     if (!content || typeof content !== "string" || content.trim().length === 0) {
       return NextResponse.json(

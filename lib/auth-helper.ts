@@ -1,15 +1,30 @@
 import { NextRequest } from "next/server";
+import { auth } from "@/auth";
 import { db, users } from "@/db";
 import { eq } from "drizzle-orm";
 
 /**
- * Resolves the currently authenticated user for API handlers.
- * - Checks x-user-id header (convenient for API testing/dev).
- * - Fallback: creates or returns a default dev citizen user if no session is set.
+ * Resolves the currently authenticated user for API handlers:
+ * 1. Checks real NextAuth session.
+ * 2. Fallback: checks x-user-id header (for API dev/curl testing).
+ * 3. Fallback: returns default dev citizen user for local testing.
  */
 export async function getSessionUser(req?: NextRequest) {
-  const headerUserId = req?.headers.get("x-user-id");
+  // 1. Real session check
+  try {
+    const session = await auth();
+    if (session?.user?.id) {
+      const dbUser = await db.query.users.findFirst({
+        where: eq(users.id, session.user.id),
+      });
+      if (dbUser) return dbUser;
+    }
+  } catch (err) {
+    // Session check skipped in non-cookie environments
+  }
 
+  // 2. Dev header check
+  const headerUserId = req?.headers.get("x-user-id");
   if (headerUserId) {
     const existing = await db.query.users.findFirst({
       where: eq(users.id, headerUserId),
@@ -17,7 +32,7 @@ export async function getSessionUser(req?: NextRequest) {
     if (existing) return existing;
   }
 
-  // Check if default dev user exists or create one
+  // 3. Fallback dev citizen user
   const devId = "usr_dev_citizen";
   let devUser = await db.query.users.findFirst({
     where: eq(users.id, devId),

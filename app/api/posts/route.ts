@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { db, posts, users, topics, tags, postTags, votes, savedPosts, reposts, hiddenPosts, mutedUsers, blockedUsers, follows } from "@/db";
 import { eq, and, desc, notInArray, inArray, sql } from "drizzle-orm";
 import { getSessionUser } from "@/lib/auth-helper";
+import { enforceRateLimit } from "@/lib/rate-limit";
+import { isDuplicateRequest } from "@/lib/debounce";
 
 export async function GET(req: NextRequest) {
   try {
@@ -179,6 +181,11 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const currentUser = await getSessionUser(req);
+
+    // Rate Limit: Max 5 posts per minute per citizen
+    const rateLimitError = enforceRateLimit(req, currentUser.id, { limit: 5, windowMs: 60000 }, "create-post");
+    if (rateLimitError) return rateLimitError;
+
     const body = await req.json();
 
     const {
@@ -192,6 +199,14 @@ export async function POST(req: NextRequest) {
       images = [],
       tags: inputTags = [],
     } = body;
+
+    // Prevent rapid double-click duplicate post submission
+    if (isDuplicateRequest(`post:${currentUser.id}:${title?.trim()}`, 2000)) {
+      return NextResponse.json(
+        { success: false, error: "Duplicate submission detected. Please wait a moment." },
+        { status: 429 }
+      );
+    }
 
     // Validations
     if (!title || typeof title !== "string" || title.trim().length < 3) {

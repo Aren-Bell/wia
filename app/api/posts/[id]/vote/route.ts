@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db, posts, votes, notifications } from "@/db";
 import { eq, and, sql } from "drizzle-orm";
 import { getSessionUser } from "@/lib/auth-helper";
+import { enforceRateLimit } from "@/lib/rate-limit";
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -11,6 +12,11 @@ export async function POST(req: NextRequest, { params }: Params) {
   try {
     const { id: postId } = await params;
     const currentUser = await getSessionUser(req);
+
+    // Rate Limit: Max 40 votes per minute
+    const rateLimitError = enforceRateLimit(req, currentUser.id, { limit: 40, windowMs: 60000 }, "vote");
+    if (rateLimitError) return rateLimitError;
+
     const body = await req.json();
 
     const voteType = body?.voteType?.toUpperCase();
