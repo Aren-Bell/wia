@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { expectApplicationFrame } from "./presentation";
 import { seedPosts, people } from "../mocks/data";
 import {
   closureDate,
@@ -87,7 +88,7 @@ test("explore applies filters, resets empty results and opens account preview", 
   await main.getByRole("searchbox").fill("trotoar");
   await main.getByRole("button", { name: "Cari", exact: true }).click();
   await expect(main.locator(".post-card")).toHaveCount(1);
-  await main.locator("summary").click();
+  await main.locator(".filter-dropdown > summary").click();
   await main
     .getByRole("checkbox", { name: "Dinas Perhubungan", exact: true })
     .check();
@@ -126,13 +127,13 @@ test("timeline excludes active and failed reports and preserves original URL", a
   await expect(main.locator(".post-card")).toHaveCount(2);
   await expect(main).toContainText("Tidak ada suara");
   await expect(main).not.toContainText("Laporan tetap terbuka");
-  await main.locator("summary").click();
+  await main.locator(".filter-dropdown > summary").click();
   await main
     .getByRole("checkbox", { name: "Dinas Perhubungan", exact: true })
     .check();
   await main.getByRole("button", { name: "Terapkan" }).click();
   await expect(main.locator(".post-card")).toHaveCount(2);
-  await main.locator("summary").click();
+  await main.locator(".filter-dropdown > summary").click();
   await main.getByLabel("Dari tanggal").fill("2026-11-06");
   await main.getByLabel("Sampai tanggal").fill("2026-11-05");
   await main.getByRole("button", { name: "Terapkan" }).click();
@@ -169,6 +170,7 @@ test("discovery pages fit desktop/tablet/mobile in both themes", async ({
             () => document.documentElement.scrollWidth <= innerWidth,
           ),
         ).toBe(true);
+        await expectApplicationFrame(page, ".directory-controls");
         await page.screenshot({
           path: `test-results/${route.slice(1)}-${width}-${theme}.png`,
         });
@@ -194,7 +196,7 @@ test("compact filter dropdown supports multiple selections, tokens and dismissal
   const controls = main.locator(".directory-controls");
   const before = (await controls.boundingBox())!.height;
   expect(before).toBeLessThan(250);
-  await main.locator("summary").click();
+  await main.locator(".filter-dropdown > summary").click();
   const panel = main.getByRole("region", { name: "Filter pencarian" });
   await expect(panel).toBeVisible();
   expect((await controls.boundingBox())!.height).toBeCloseTo(before);
@@ -220,13 +222,13 @@ test("compact filter dropdown supports multiple selections, tokens and dismissal
     .getByRole("button", { name: "Hapus filter @DinasPUPR", exact: true })
     .click();
   await expect(main.locator(".post-card")).toHaveCount(4);
-  await main.locator("summary").click();
+  await main.locator(".filter-dropdown > summary").click();
   await panel
     .getByRole("checkbox", { name: "Jawa Barat", exact: true })
     .check();
   await page.keyboard.press("Escape");
   await expect(panel).toBeHidden();
-  await main.locator("summary").click();
+  await main.locator(".filter-dropdown > summary").click();
   await expect(
     panel.getByRole("checkbox", { name: "Jawa Barat", exact: true }),
   ).not.toBeChecked();
@@ -236,7 +238,7 @@ test("compact filter dropdown supports multiple selections, tokens and dismissal
   await expect(main.locator(".post-card")).toHaveCount(5);
   for (const width of [1440, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
-    await main.locator("summary").click();
+    await main.locator(".filter-dropdown > summary").click();
     await expect(panel).toBeVisible();
     expect(
       await page.evaluate(

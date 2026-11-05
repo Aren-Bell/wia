@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useDemo } from "@/features/auth/DemoProvider";
 import { ProductShell } from "@/components/layout/ProductShell";
@@ -7,7 +8,6 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Dialog } from "@/components/ui/Dialog";
 import { SearchControls } from "./SearchControls";
 import { PostCard } from "@/features/posts/PostCard";
-import { people } from "@/mocks/data";
 import type { Person } from "@/types/models";
 import {
   closureDate,
@@ -17,7 +17,7 @@ import {
 } from "./filters";
 
 export function Directory({ timeline = false }: { timeline?: boolean }) {
-  const { posts, user, following, setFollowing } = useDemo();
+  const { people, posts, user, following, setFollowing } = useDemo();
   const [query, setQuery] = useState("");
   const [applied, setApplied] = useState<SearchFilters>({ ...emptyFilters });
   const [tab, setTab] = useState("posts");
@@ -120,7 +120,7 @@ export function Directory({ timeline = false }: { timeline?: boolean }) {
         {accounts
           ? accountResults.map((person) => (
               <article className="account-result" key={person.localKey}>
-                <Avatar name={person.name} />
+                <Avatar name={person.name} src={person.image} />
                 <div>
                   <button
                     className="account-name"
@@ -192,9 +192,13 @@ export function Directory({ timeline = false }: { timeline?: boolean }) {
             </h3>
             <p className="muted">@{preview.username}</p>
             <p>{preview.bio}</p>
-            <p className="small muted">
-              Profil lengkap akan tersedia pada tahap berikutnya.
-            </p>
+            <Link
+              className="button button--secondary"
+              href={`/profile/${preview.localKey}`}
+              onClick={() => setPreview(null)}
+            >
+              Lihat profil lengkap
+            </Link>
             {preview.localKey !== user?.localKey && (
               <Button onClick={() => follow(preview)}>
                 {following.includes(preview.localKey)

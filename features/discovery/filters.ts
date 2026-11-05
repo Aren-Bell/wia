@@ -25,7 +25,7 @@ export function jakartaDay(timestamp: number) {
 }
 
 export function closureDate(post: Post, now: number): number | null {
-  if (post.kind !== "report") return null;
+  if (post.isDeleted || post.kind !== "report") return null;
   const latest = post.resolutions.at(-1);
   if (!latest) return null;
   const result = resolutionResult(latest, now);
@@ -44,6 +44,7 @@ export function filterPosts(
   const query = filters.query.trim().toLocaleLowerCase("id-ID");
   return posts
     .filter((post) => {
+      if (post.isDeleted) return false;
       const closed = closureDate(post, now);
       if (timeline && closed === null) return false;
       if (filters.kind.length && !filters.kind.includes(post.kind))
