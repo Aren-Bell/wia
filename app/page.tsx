@@ -1,37 +1,7 @@
-import { theme } from "@/app/config";
-import Navbar from "@/app/components/land/Navbar";
-import Hero from "@/app/components/land/Hero";
-import NetworkSection from "@/app/components/land/NetworkSection";
-import CtaSection from "@/app/components/land/CtaSection";
-import Footer from "@/app/components/land/Footer";
-
 export default function Home() {
   return (
-    <div
-      id="top"
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: theme.colors.background.page,
-        fontFamily: theme.typography.fontFamily,
-      }}
-    >
-      <Navbar />
-
-      <main
-        id="footer-product"
-        style={{
-          flex: 1,
-          width: "100%",
-        }}
-      >
-        <Hero />
-        <NetworkSection />
-        <CtaSection />
-      </main>
-
-      <Footer />
-    </div>
+    <main className="min-h-screen flex items-center justify-center p-8 bg-[#f9f9f9] text-[#262626]">
+      <h1 className="text-2xl font-bold">Kavi Blank Canvas</h1>
+    </main>
   );
 }
