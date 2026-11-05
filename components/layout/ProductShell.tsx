@@ -23,19 +23,21 @@ import { people } from "@/mocks/data";
 
 const destinations = [
   { label: "Beranda", icon: Home, href: "/home" },
-  { label: "Jelajah", icon: Search },
+  { label: "Jelajah", icon: Search, href: "/explore" },
   { label: "Obrolan", icon: MessagesSquare },
   { label: "Notifikasi", icon: Bell },
   { label: "Profil", icon: UserRound },
-  { label: "Timeline Kinerja", icon: ListTree },
+  { label: "Timeline Kinerja", icon: ListTree, href: "/timeline" },
   { label: "Pengaturan", icon: Settings },
 ];
 export function ProductShell({
   title,
   children,
+  active = "home",
 }: {
   title: string;
   children: ReactNode;
+  active?: "home" | "explore" | "timeline";
 }) {
   const { user, logout, following, setFollowing, theme, setTheme } = useDemo();
   const [composer, setComposer] = useState(false);
@@ -61,8 +63,8 @@ export function ProductShell({
               <Link
                 key={label}
                 href={href}
-                aria-current={href === "/home" ? "page" : undefined}
-                className={`nav-item ${href === "/home" ? "active" : ""} nav-group-${index}`}
+                aria-current={href === `/${active}` ? "page" : undefined}
+                className={`nav-item ${href === `/${active}` ? "active" : ""} nav-group-${index}`}
               >
                 <Icon />
                 <span>{label}</span>
@@ -144,10 +146,10 @@ export function ProductShell({
         </Button>
       </main>
       <aside className="support-column">
-        <button className="search-box" onClick={() => unavailable("Pencarian")}>
+        <Link className="search-box" href="/explore">
           <Search />
           Cari di KAVI
-        </button>
+        </Link>
         <section className="suggestions">
           <h2>Temukan suara baru</h2>
           {people
@@ -188,14 +190,19 @@ export function ProductShell({
         <Link
           href="/home"
           aria-label="Beranda"
-          aria-current="page"
-          className="active"
+          aria-current={active === "home" ? "page" : undefined}
+          className={active === "home" ? "active" : ""}
         >
           <Home />
         </Link>
-        <button aria-label="Jelajah" onClick={() => unavailable("Jelajah")}>
+        <Link
+          href="/explore"
+          aria-label="Jelajah"
+          aria-current={active === "explore" ? "page" : undefined}
+          className={active === "explore" ? "active" : ""}
+        >
           <Search />
-        </button>
+        </Link>
         <button
           className="island-compose"
           aria-label="Buat postingan"
@@ -206,12 +213,14 @@ export function ProductShell({
         <button aria-label="Obrolan" onClick={() => unavailable("Obrolan")}>
           <MessagesSquare />
         </button>
-        <button
+        <Link
+          href="/timeline"
           aria-label="Timeline Kinerja"
-          onClick={() => unavailable("Timeline Kinerja")}
+          aria-current={active === "timeline" ? "page" : undefined}
+          className={active === "timeline" ? "active" : ""}
         >
           <ListTree />
-        </button>
+        </Link>
         <button aria-label="Profil" onClick={() => unavailable("Profil")}>
           <UserRound />
         </button>

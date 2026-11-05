@@ -2,7 +2,7 @@
 
 ## Scope of this branch
 
-Homepage (`/home`), sample login (`/login`), reusable product shell and controls, general/report composer, cards, detail/branch routes, nested comment connectors and resolution UI. Light/dark desktop, tablet and mobile layouts are included. Jelajah and Timeline are deferred and intentionally absent from this commit; their navigation displays an unavailable notice. The complete drafts remain in the separate local `wia` checkout.
+Homepage (`/home`), sample login (`/login`), reusable product shell and controls, general/report composer, cards, detail/branch routes, nested comment connectors and resolution UI. Light/dark desktop, tablet and mobile layouts are included. Jelajah (`/explore`) and Timeline Kinerja (`/timeline`) are included. Search supports posts, reports and accounts; the Timeline lists only closed original reports, including zero-vote automatic closures, in reverse closure order.
 
 This branch is based on the latest backend master. Existing APIs, auth, database schema, backend utilities and backend tests are preserved. UI interactions still use the frontend demo provider; API integration is left to the backend team.
 
@@ -53,4 +53,10 @@ pnpm test:frontend
 pnpm format:check:frontend
 ```
 
-Playwright is scoped to `frontend.spec.ts`; it does not run the backend test scripts or touch external databases. Existing backend tests keep their own scripts. Formatting is scoped to frontend-owned files so it does not rewrite API routes or backend utilities.
+Playwright is scoped to `frontend.spec.ts` and `discovery.spec.ts`; it does not run the backend test scripts or touch external databases. Existing backend tests keep their own scripts. Formatting is scoped to frontend-owned files so it does not rewrite API routes or backend utilities.
+
+## Discovery and compact filters
+
+`features/discovery` owns the shared Directory, SearchControls and pure filtering helpers. Filters open from a button inside the search bar as an overlay, with checkbox groups and an inclusive date range in WIB. Multiple choices use OR within each group and AND across groups. Apply commits the draft; Escape or clicking outside dismisses it without changing results. Applied filters appear as removable tokens, including @agency tokens. Reset removes filters; Hapus semua also clears the query. Account search ignores post filters and supports account preview/follow.
+
+Searching reports matches every tagged agency, not a designated solver. Anonymous author names are excluded from post search. Explore dates refer to publication; Timeline dates refer to the latest completed validation deadline. Neither search nor Timeline creates copies of reports; cards open their original detail routes. All backend IDs remain blank and no API integration is enabled.
