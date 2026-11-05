@@ -16,7 +16,8 @@
     "test:phase5": "tsx tests/api-phase5.test.ts",
     "test:ratelimit": "tsx tests/rate-limit.test.ts",
     "test:buffer": "tsx tests/buffered-counters.test.ts",
-    "test:all": "tsx tests/api-phase1.test.ts && tsx tests/api-phase2.test.ts && tsx tests/api-phase3.test.ts && tsx tests/api-phase4.test.ts && tsx tests/api-phase5.test.ts && tsx tests/rate-limit.test.ts && tsx tests/buffered-counters.test.ts"
+    "test:seo": "tsx tests/seo-llms.test.ts",
+    "test:all": "tsx tests/api-phase1.test.ts && tsx tests/api-phase2.test.ts && tsx tests/api-phase3.test.ts && tsx tests/api-phase4.test.ts && tsx tests/api-phase5.test.ts && tsx tests/rate-limit.test.ts && tsx tests/buffered-counters.test.ts && tsx tests/seo-llms.test.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",
