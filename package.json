@@ -17,7 +17,12 @@
     "test:ratelimit": "tsx tests/rate-limit.test.ts",
     "test:buffer": "tsx tests/buffered-counters.test.ts",
     "test:seo": "tsx tests/seo-llms.test.ts",
-    "test:all": "tsx tests/api-phase1.test.ts && tsx tests/api-phase2.test.ts && tsx tests/api-phase3.test.ts && tsx tests/api-phase4.test.ts && tsx tests/api-phase5.test.ts && tsx tests/rate-limit.test.ts && tsx tests/buffered-counters.test.ts && tsx tests/seo-llms.test.ts"
+    "test:all": "tsx tests/api-phase1.test.ts && tsx tests/api-phase2.test.ts && tsx tests/api-phase3.test.ts && tsx tests/api-phase4.test.ts && tsx tests/api-phase5.test.ts && tsx tests/rate-limit.test.ts && tsx tests/buffered-counters.test.ts && tsx tests/seo-llms.test.ts",
+    "typecheck": "tsc --noEmit",
+    "test:frontend": "playwright test",
+    "format:frontend": "prettier --write app/globals.css app/layout.tsx app/page.tsx app/home app/login app/posts components features lib/validation.ts mocks types tests/frontend.spec.ts playwright.config.ts docs/FRONTEND.md",
+    "format:check:frontend": "prettier --check app/globals.css app/layout.tsx app/page.tsx app/home app/login app/posts components features lib/validation.ts mocks types tests/frontend.spec.ts playwright.config.ts docs/FRONTEND.md",
+    "lint:frontend": "eslint app/home app/login app/posts app/layout.tsx app/page.tsx components features lib/validation.ts mocks types tests/frontend.spec.ts playwright.config.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",
@@ -43,7 +48,9 @@
     "eslint-config-next": "16.4.3",
     "tailwindcss": "^4",
     "tsx": "^4.23.15",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@playwright/test": "^1.64.1",
+    "prettier": "^3.9.10"
   },
   "packageManager": "pnpm@11.17.0"
 }
