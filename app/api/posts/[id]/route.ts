@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, posts, users, votes, savedPosts, reposts } from "@/db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { getSessionUser } from "@/lib/auth-helper";
 import { recordPostViewBuffered } from "@/lib/redis";
 

@@ -23,7 +23,7 @@ async function runBufferedCounterTests() {
   await db.insert(posts).values({
     id: testPostId,
     authorId: "usr_dev_citizen",
-    topicId: firstTopic.id,
+    topicId: String(firstTopic.id),
     title: "Buffered Counter Test Post",
     content: "Testing Redis write-behind buffer",
     locationName: "Jakarta",
@@ -34,7 +34,6 @@ async function runBufferedCounterTests() {
     downvotesCount: 1,
     repostsCount: 2,
     postedAt: now,
-    createdAt: now,
     updatedAt: now,
   });
 
