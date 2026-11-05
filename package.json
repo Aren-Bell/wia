@@ -10,7 +10,8 @@
     "db:check": "tsx scripts/check-db.ts",
     "db:seed": "tsx scripts/seed-dummy.ts",
     "test:phase1": "tsx tests/api-phase1.test.ts",
-    "test:phase2": "tsx tests/api-phase2.test.ts"
+    "test:phase2": "tsx tests/api-phase2.test.ts",
+    "test:phase3": "tsx tests/api-phase3.test.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.18.0",
