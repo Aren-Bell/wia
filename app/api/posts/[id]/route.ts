@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db, posts, users, votes, savedPosts, reposts } from "@/db";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { getSessionUser } from "@/lib/auth-helper";
+import { recordPostViewBuffered } from "@/lib/redis";
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -56,11 +57,8 @@ export async function GET(req: NextRequest, { params }: Params) {
       );
     }
 
-    // 2. Increment views count asynchronously
-    await db
-      .update(posts)
-      .set({ viewsCount: sql`${posts.viewsCount} + 1` })
-      .where(eq(posts.id, id));
+    // 2. Increment views in Redis buffer (Zero SQL writes to Turso)
+    const pendingViews = await recordPostViewBuffered(id);
 
     // 3. Check current user interactions
     const [userVote, userSaved, userReposted] = await Promise.all([
@@ -97,7 +95,7 @@ export async function GET(req: NextRequest, { params }: Params) {
       downvotesCount: post.downvotesCount,
       commentsCount: post.commentsCount,
       repostsCount: post.repostsCount,
-      viewsCount: post.viewsCount + 1,
+      viewsCount: (post.viewsCount ?? 0) + pendingViews,
       isPinned: post.isPinned,
       postedAt: post.postedAt,
       author: post.author,
